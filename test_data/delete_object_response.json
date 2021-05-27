@@ -1,0 +1,7 @@
+{
+    "ResponseMetadata": {
+      "DeleteMarker": true,
+      "VersionId": "string",
+      "RequestCharged": "requester"
+    }
+}
