@@ -74,6 +74,18 @@ def test_get_single_group_contents(tmpdir):
 
 
 @pytest.mark.validation
+def test_get_no_group_contents(tmpdir):
+    """
+    Tests returning a group
+    """
+
+    group_filenames = ['group1_iam']
+    prowler_group = get_group_ids(tmpdir, group_filenames)
+
+    assert len(prowler_group) == 0
+
+
+@pytest.mark.validation
 def test_get_multiple_group_contents(tmpdir):
     """
     Tests returning a group
