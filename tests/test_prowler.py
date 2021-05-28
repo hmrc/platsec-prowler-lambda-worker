@@ -45,29 +45,11 @@ from src.platsec.compliance.prowler import (
     create_workspace,
     delete_workspace,
     extract_body,
-    get_prowler_config
+    get_prowler_config,
+    get_group_ids
 )
 
 from unittest.mock import Mock, patch
-multiple_groups = (
-    ['group_1', 'platsec'],
-    ['group_2', 'platsec']
-)
-
-
-@pytest.fixture()
-def get_group_id():
-    return ['group_1']
-
-
-@pytest.fixture(params=multiple_groups)
-def get_group_ids(request):
-    return request.param
-
-
-@pytest.mark.validation
-def test_get_group_ids(get_group_ids):
-    assert get_group_ids == ['group_1','platsec']
 
 
 @pytest.mark.validation
@@ -77,8 +59,40 @@ def test_get_config_returns_valid() -> None:
 
 
 @pytest.mark.validation
-def test_get_group(get_group_id):
-    assert get_group_id == ['group_1']
+def test_get_single_group_contents(tmpdir):
+    """
+    Tests returning a group
+    """
+
+    group_filenames = ['group1_iam']
+    group1_iam_file = tmpdir.join('group1_iam.sh')
+    group1_iam_file.write('GROUP_ID[1]="group1"')
+
+    prowler_group = get_group_ids(tmpdir, group_filenames)
+
+    assert len(prowler_group) > 0
+
+
+@pytest.mark.validation
+def test_get_multiple_group_contents(tmpdir):
+    """
+    Tests returning a group
+    """
+
+    group_filenames = ['group1_iam', 'group20_platsec', 'group2_ec2']
+    group1_iam_file = tmpdir.join('group1_iam.sh')
+    group20_platsec_file = tmpdir.join('group20_platsec.sh')
+    group2_ec2_file = tmpdir.join('group2_ec2.sh')
+
+    group1_iam_file.write('GROUP_ID[1]="group1"')
+    group20_platsec_file.write('GROUP_ID[20]="platsec"')
+    group2_ec2_file.write('GROUP_ID[2]="ec2"')
+
+    prowler_group = get_group_ids(tmpdir, group_filenames)
+
+    assert len(prowler_group) == 3
+
+
 
 
 @pytest.mark.core

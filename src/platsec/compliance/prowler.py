@@ -191,6 +191,23 @@ def get_groups(records_data: str, default_group: str) -> List:
         raise err
 
 
+def get_group_ids(path: str, group_filenames: list) -> List:
+    """
+    Returns a list of group_ids from
+    the specified path
+    """
+    group_ids = []
+    for file in group_filenames:
+        path_to_check = os.path.join(path, file + "." + "sh")
+        if os.path.exists(path_to_check):
+            os.chdir(path)
+            f = open(file + "." + "sh", "r")
+            file_contents = f.readlines()
+            group_ids.append(file_contents)
+            f.close()
+    return group_ids
+
+
 def create_new_report_name(account_id: str) -> str:
     """
     Creates an initial report name
