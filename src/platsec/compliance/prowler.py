@@ -208,6 +208,23 @@ def get_group_ids(path: str, group_filenames: list) -> List:
     return group_ids
 
 
+def extract_group_ids(groups: list) -> List:
+    """
+    Extracts the groups ids from a list
+    containing specified groups file contents
+    """
+    group_ids = []
+    for group in groups:
+        group_parts = group[0].rsplit(" ")
+        group_id_part = group_parts[0]
+        start = group_id_part.find('"')
+        end = len(group_id_part)
+        group_id = group_id_part[start:end]
+        group_ids.append(group_id)
+
+    return group_ids
+
+
 def create_new_report_name(account_id: str) -> str:
     """
     Creates an initial report name

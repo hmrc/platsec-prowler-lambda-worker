@@ -46,7 +46,8 @@ from src.platsec.compliance.prowler import (
     delete_workspace,
     extract_body,
     get_prowler_config,
-    get_group_ids
+    get_group_ids,
+    extract_group_ids
 )
 
 from unittest.mock import Mock, patch
@@ -71,6 +72,32 @@ def test_get_single_group_contents(tmpdir):
     prowler_group = get_group_ids(tmpdir, group_filenames)
 
     assert len(prowler_group) > 0
+
+
+@pytest.mark.validation
+def test_get_single_group_full_contents(tmpdir):
+    """
+    Tests returning a group
+    """
+
+    group_filenames = ['group1_iam']
+    group1_iam_file = tmpdir.join('group1_iam.sh')
+    group1_iam_file.write('GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"')
+
+    prowler_group = get_group_ids(tmpdir, group_filenames)
+
+    assert len(prowler_group) > 0
+
+
+@pytest.mark.validation
+def test_extract_group_id_single_group():
+    """
+    Tests group extraction
+    """
+    groups = [['GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"']]
+    group_ids = extract_group_ids(groups)
+
+    assert len(group_ids) == 1
 
 
 @pytest.mark.validation
