@@ -101,6 +101,19 @@ def test_extract_group_id_single_group():
 
 
 @pytest.mark.validation
+def test_extract_group_id_multiple_group():
+    """
+    Tests group extraction
+    """
+    groups = [['GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"'],
+              ['GROUP_ID[2]="group2" GROUP_NUMBER[2]="2.0" GROUP_TITLE[2]="EC2Management - CIS only - [group2] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"']]
+
+    group_ids = extract_group_ids(groups)
+
+    assert len(group_ids) == 2
+
+
+@pytest.mark.validation
 def test_get_no_group_contents(tmpdir):
     """
     Tests returning a group
