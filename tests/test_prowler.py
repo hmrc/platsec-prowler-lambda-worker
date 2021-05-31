@@ -47,7 +47,18 @@ from src.platsec.compliance.prowler import (
     extract_body,
     get_prowler_config,
     get_group_ids,
-    extract_group_ids
+    extract_group_ids,
+    format_default_groups,
+    ProwlerExecutionRun
+)
+
+from src.platsec.compliance.prowler_filters import (
+    remove_escapes,
+    pretty_print
+)
+
+from src.platsec.compliance.prowler_pipeline import (
+  run_prowler
 )
 
 from unittest.mock import Mock, patch
@@ -750,6 +761,29 @@ def test_get_groups_returns_indexception() -> None:
         response = get_groups(records_data, default_group)
 
 
+@pytest.mark.core
+def test_format_default_groups() -> None:
+    default_groups = ["group20_platsec"]
+    actual = format_default_groups(default_groups)
+
+    assert len(actual) == 1
+
+
+@pytest.mark.validation
+def test_get_groups_returns_default_group() -> None:
+    """
+    Tests that the default group is returned
+    When no groups are sepcified
+    """
+    records_data = [
+                    {"Id": "480830536305", "Name": "hrkdev", "Groups": []}
+                ]
+
+    default_group = "group20_platsec"
+
+    groups = get_groups(records_data, default_group)
+    assert len(groups) == 1
+    assert groups[0] == default_group
 
 @pytest.mark.core
 def test_execute_diff_succeeds() -> None:
@@ -766,6 +800,26 @@ def test_execute_diff_succeeds() -> None:
         mock_difflib.assert_called_once()
 
     assert generated_diff_output is not None
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler.execute_prowler')
+def test_run_prowler_succeeds(mock_execute_prowler) -> None:
+    """
+    Tests that the call to run prowler
+    returns true
+    """
+    account_number = "12345783748"
+    report_name = "test_report"
+    region = "eu-west-1"
+    bucket_name = "test_bucket"
+    prowler_directory = "/test_directory"
+    groups = ["test_group_1"]
+    mock_execute_prowler.return_value = True
+
+    assert run_prowler(account_number, report_name,
+                       region, bucket_name,
+                       prowler_directory, groups)
 
 
 @pytest.mark.aws
@@ -1295,6 +1349,28 @@ def test_save_diff_returns_exception() -> None:
 
     with pytest.raises(AwsProwlerFileException):
         save_diff(bucket_name, account_id, file_name, diff_data, s3_client)
+
+
+@pytest.mark.validation
+def test_remove_escapes_returns() -> None:
+    """
+    Tests that the remove escapes returns
+    a string
+    """
+    msg = "test_message"
+    result = remove_escapes(msg)
+    assert len(result) > 0
+
+
+@pytest.mark.validation
+def test_pretty_print_returns() -> None:
+    """
+    Tests that the pretty print routing returns
+    a string
+    """
+    msg = "test_message"
+    result = pretty_print(msg)
+    assert len(result) > 0
 
 
 @pytest.mark.core

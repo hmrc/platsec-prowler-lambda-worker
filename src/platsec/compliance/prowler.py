@@ -41,8 +41,6 @@ def get_accountinfo(msg) -> str:
             return account_id
         except KeyError as err:
             raise KeyError
-        except ValueError as err:
-            raise err
 
 
 def get_account_name(msg) -> str:
@@ -140,15 +138,6 @@ def execute_prowler(account_number: str, report_name: str, region: str, bucket_n
             stdin=p1.stdout,
         )
         report_generated = True
-    except subprocess.CalledProcessError as error:
-        logger.error(error)
-    except FileNotFoundError as error:
-        logger.error(error)
-        report_generated = False
-    except Exception as error:
-        print(error)
-        logger.error(f"{account_number} did not generate prowler report")
-        report_generated = False
     finally:
         return report_generated
 
@@ -265,22 +254,16 @@ def create_workspace(workspace_location: str) -> bool:
     """
     Creates a temporary workspace
     """
-    try:
-        os.mkdir(workspace_location)
-        return True
-    except Exception:
-        return False
+    os.mkdir(workspace_location)
+    return True
 
 
 def delete_workspace(workspace_location: str) -> bool:
     """
     Deletes the temporary workspace
     """
-    try:
-        os.rmdir(workspace_location)
-        return True
-    except Exception:
-        return False
+    os.rmdir(workspace_location)
+    return True
 
 
 def format_default_groups(default_groups: list) -> list:

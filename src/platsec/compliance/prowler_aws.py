@@ -188,10 +188,6 @@ def get_file_contents(
             Bucket=bucket_name, Key=account_id + "/" + file_name
         )
         contents = file_object["Body"].read()
-    except TypeError as error:
-        raise error
-    except Exception as error:
-        raise error
     finally:
         return contents
 
