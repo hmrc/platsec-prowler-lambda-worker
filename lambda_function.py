@@ -34,7 +34,7 @@ def execute_pipeline(json_data: str):
         print(f"DEBUG **** Executing Prowler in Pipeline for {prowler_run.account_id}, {prowler_config.region}")
         process_prowler(prowler_run.account_id, prowler_run.new_report_name,
                         prowler_config.region, prowler_config.bucket_name, prowler_config.script_location,
-                        prowler_run.groups)
+                        prowler_run.group_ids)
         print(f"DEBUG: **** Executing AWS validation in Pipeline for {prowler_run.account_id}")
         process_aws_validation(prowler_config.bucket_name, prowler_run.account_id, s3_client)
         print(f"DEBUG **** Executing Difference creation in Pipeline for {prowler_run.account_id}")

@@ -656,7 +656,7 @@ def test_check_s3_output_folder_for_account_doesnt_exist(mocker) -> None:
 
 
 @pytest.mark.core
-def test_execute_prowler() -> None:
+def test_execute_prowler(tmpdir) -> None:
     """
     Tests the execution of prowler
     """
@@ -665,7 +665,10 @@ def test_execute_prowler() -> None:
     bucket_name = "test_bucket"
     region = "eu-west-2"
     group = ["group20_platsec"]
-    prowler_directory = "./src/platsec/compliance/lib/prowler"
+    prowler_directory = tmpdir.mkdir('prowler_dir')
+    prowler_file = prowler_directory.join('prowler')
+    prowler_file.write('#!/bin/bash echo "Hello World"')
+    prowler_file.chmod(744)
 
     with patch('subprocess.run') as mock_prowler:
         mock_prowler.return_value = True
@@ -677,7 +680,7 @@ def test_execute_prowler() -> None:
 
 
 @pytest.mark.core
-def test_execute_prowler_with_multiple_groups() -> None:
+def test_execute_prowler_with_multiple_groups(tmpdir) -> None:
     """
     Tests the execution of prowler
     """
@@ -686,7 +689,10 @@ def test_execute_prowler_with_multiple_groups() -> None:
     bucket_name = "test_bucket"
     region = "eu-west-2"
     group = ["group20_platsec", "group23", "group_35"]
-    prowler_directory = "./src/platsec/compliance/lib/prowler"
+    prowler_directory = tmpdir.mkdir('prowler_dir')
+    prowler_file = prowler_directory.join('prowler')
+    prowler_file.write('#!/bin/bash echo "Hello World"')
+    prowler_file.chmod(744)
 
     with patch('subprocess.run') as mock_prowler:
         mock_prowler.return_value = True
@@ -698,7 +704,7 @@ def test_execute_prowler_with_multiple_groups() -> None:
 
 
 @pytest.mark.core
-def test_execute_prowler_returns_false_on_exception() -> None:
+def test_execute_prowler_returns_false_on_exception(tmpdir) -> None:
     """
     Test that an exception is raised and caught
     """
@@ -706,11 +712,15 @@ def test_execute_prowler_returns_false_on_exception() -> None:
     role = "test_role"
     bucket_name = "test_bucket"
     region = "eu-west-2"
-    prowler_directory = "../src/platsec/compliance/lib/prowler"
-
+    group = ["group20_platsec", "group23", "group_35"]
+    prowler_directory = tmpdir.mkdir('prowler_dir')
+    prowler_file = prowler_directory.join('prowler')
+    prowler_file.write('#!/bin/bash echo "Hello World"')
+    prowler_file.chmod(744)
     with patch('subprocess.run') as mock_prowler:
         mock_prowler.side_effect = Exception
-        report_result = execute_prowler(account_number, role, region, bucket_name, prowler_directory)
+        report_result = execute_prowler(account_number, role, region,
+                                        bucket_name, prowler_directory, group)
 
     assert report_result is False
 
@@ -735,9 +745,9 @@ def test_execute_diff_raises_exception() -> None:
 @pytest.mark.validation
 def test_get_groups_returns_indexception() -> None:
     records_data = ""
-
+    default_group = ""
     with pytest.raises(IndexError):
-        response = get_groups(records_data)
+        response = get_groups(records_data, default_group)
 
 
 

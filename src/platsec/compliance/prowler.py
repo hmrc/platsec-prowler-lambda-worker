@@ -329,3 +329,4 @@ class ProwlerExecutionRun:
     def __init__(self):
         self.new_report_name = None
         self.account_id = None
+        self.group_ids = None

@@ -15,7 +15,9 @@ from src.platsec.compliance.prowler import (
     create_new_report_name,
     execute_prowler,
     create_diff,
-    create_new_diff_name
+    create_new_diff_name,
+    get_group_ids,
+    extract_group_ids
 )
 from src.platsec.compliance.prowler_aws import (check_output_folder, create_output_folder,
                                                 get_filenames, get_file_contents, save_diff,
@@ -43,6 +45,8 @@ def execute_validation(json_data: str, group_location: str, default_group: str) 
         prowler_run.groups = get_groups(prowler_run.msgbody, default_group)
         prowler_run.new_report_name = create_new_report_name(prowler_run.account_id)
         validate_groups(prowler_run.groups, group_location, default_group)
+        prowler_run.group_contents = get_group_ids(group_location, prowler_run.groups)
+        prowler_run.group_ids = extract_group_ids(prowler_run.group_contents)
         return prowler_run
     except Exception as error:
         print(f"DEBUG *** execute_validation err {error}")
