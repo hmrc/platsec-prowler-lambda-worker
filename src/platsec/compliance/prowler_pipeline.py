@@ -139,7 +139,7 @@ def execute_save_diff(filtered_diff_data: str, bucket_name: str, account_id: str
         return file_created
 
 
-def execute_clean_up(bucket_name: str, account_id:str, s3_client: BaseClient):
+def execute_clean_up(bucket_name: str, s3_client: BaseClient) -> bool:
     """
     Deletes oldest prowler execution report as its no longer
     needed.
@@ -150,8 +150,10 @@ def execute_clean_up(bucket_name: str, account_id:str, s3_client: BaseClient):
     2) The newest prowler execution file
     3) The difference report
     """
+    files_deleted = False
     file_list = get_sorted_file_list(bucket_name, s3_client)
     print(f"DEBUG*** execute_clean_up file {file_list[0]}")
     if len(file_list) > 3:
         delete_old_files(bucket_name, file_list[0], s3_client)
-
+        files_deleted = True
+    return files_deleted

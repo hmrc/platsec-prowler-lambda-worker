@@ -65,7 +65,9 @@ from src.platsec.compliance.prowler_pipeline import (
   create_aws_environment,
   execute_save_diff,
   get_aws_client,
-  execute_filters
+  execute_filters,
+  execute_clean_up,
+  execute_diff_generation
 )
 
 from unittest.mock import Mock, patch
@@ -898,6 +900,45 @@ def test_execute_filters() -> None:
 
     actual = execute_filters(diff_data, filter_list)
     assert len(actual) > 0
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.get_sorted_file_list')
+def test_execute_clean_up(mock_exectute_cleanup) -> None:
+    """
+    Tests that we can clean up
+    the file system environment
+    """
+    bucket_name="TestBucket"
+    mock_exectute_cleanup.return_value = ["test.txt"]
+    files = execute_clean_up(bucket_name, BaseClient)
+    assert files is False
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.get_sorted_file_list')
+@patch('src.platsec.compliance.prowler_pipeline.delete_old_files')
+def test_execute_clean_up_multiple_files(mock_execute_cleanup, mock_delete_old_files) -> None:
+    """
+    Tests that we can clean up
+    the file system environment
+    """
+    bucket_name="TestBucket"
+    files_list = mock_execute_cleanup.return_value = ["test.txt", "ert.dh", "tryr.sh", "ert.sh"]
+    mock_delete_old_files.return_value = "test"
+
+    files = execute_clean_up(bucket_name, BaseClient)
+
+    assert files is True
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.get_filenames', return_value=["test.txt"])
+def test_execute_diff_generation(mock_execute_diff_generation) -> None:
+    bucket_name = "testBucket"
+    account_id = "123456789"
+    result = execute_diff_generation(bucket_name, account_id, BaseClient)
+    assert result == ''
 
 
 @pytest.mark.aws
