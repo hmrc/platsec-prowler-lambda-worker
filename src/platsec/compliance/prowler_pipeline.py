@@ -96,8 +96,7 @@ def create_aws_environment(bucket_name: str, account_id: str, s3_client: BaseCli
     try:
         create_output_folder(bucket_name, account_id, s3_client)
         bucket_created = True
-        return bucket_created
-    except AwsBucketPathCreateException:
+    finally:
         return bucket_created
 
 
@@ -136,8 +135,7 @@ def execute_save_diff(filtered_diff_data: str, bucket_name: str, account_id: str
         diff_filename = create_new_diff_name(account_id)
         save_diff(bucket_name, account_id, diff_filename, filtered_diff_data, s3_client)
         file_created = True
-        return file_created
-    except AwsProwlerFileException:
+    finally:
         return file_created
 
 

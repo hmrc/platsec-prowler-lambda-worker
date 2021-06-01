@@ -62,7 +62,10 @@ from src.platsec.compliance.prowler_pipeline import (
   run_prowler,
   get_config,
   execute_aws_validation,
-  create_aws_environment
+  create_aws_environment,
+  execute_save_diff,
+  get_aws_client,
+  execute_filters
 )
 
 from unittest.mock import Mock, patch
@@ -858,6 +861,44 @@ def test_create_aws_environment(mock_create_aws_environment) -> None:
     bucket_name = "TestBucket"
     account_id = "123456789"
     assert create_aws_environment(bucket_name,account_id,BaseClient)
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.save_diff')
+def test_execute_save_diff(mock_execute_save_diff) -> None:
+    """
+    Tests that execute_save_diff returns
+    a filename
+    """
+    bucket_name = "TestBucket"
+    account_id = "123456789"
+    filtered_diff_data = "djsljfssgsgs"
+
+    mock_execute_save_diff.return_value = "TestFile"
+    assert execute_save_diff(filtered_diff_data, bucket_name, account_id, BaseClient)
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.setup_s3_client_lambda',
+       return_value=BaseClient)
+def test_get_aws_client(mock_get_aws_client) -> None:
+    """
+    Test that a baseclient is returned
+    """
+    assert get_aws_client()
+
+
+@pytest.mark.core
+def test_execute_filters() -> None:
+    """
+    Tests that we can execute a filter list
+    """
+    diff_data = "fasdfs\n"
+    filter_list = [remove_escapes]
+
+    actual = execute_filters(diff_data, filter_list)
+    assert len(actual) > 0
+
 
 @pytest.mark.aws
 def test_copy_report_to_s3() -> None:
