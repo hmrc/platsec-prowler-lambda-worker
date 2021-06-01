@@ -49,7 +49,8 @@ from src.platsec.compliance.prowler import (
     get_group_ids,
     extract_group_ids,
     format_default_groups,
-    ProwlerExecutionRun
+    ProwlerExecutionRun,
+    ProwlerConfig
 )
 
 from src.platsec.compliance.prowler_filters import (
@@ -58,7 +59,10 @@ from src.platsec.compliance.prowler_filters import (
 )
 
 from src.platsec.compliance.prowler_pipeline import (
-  run_prowler
+  run_prowler,
+  get_config,
+  execute_aws_validation,
+  create_aws_environment
 )
 
 from unittest.mock import Mock, patch
@@ -803,7 +807,7 @@ def test_execute_diff_succeeds() -> None:
 
 
 @pytest.mark.core
-@patch('src.platsec.compliance.prowler.execute_prowler')
+@patch('src.platsec.compliance.prowler_pipeline.execute_prowler', return_value=True)
 def test_run_prowler_succeeds(mock_execute_prowler) -> None:
     """
     Tests that the call to run prowler
@@ -815,12 +819,45 @@ def test_run_prowler_succeeds(mock_execute_prowler) -> None:
     bucket_name = "test_bucket"
     prowler_directory = "/test_directory"
     groups = ["test_group_1"]
-    mock_execute_prowler.return_value = True
+    #mock_execute_prowler.return_value = True
 
     assert run_prowler(account_number, report_name,
                        region, bucket_name,
                        prowler_directory, groups)
 
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.get_prowler_config')
+def test_get_config(mock_get_config) -> None:
+    """
+    Tests that the pipeline returns
+    A configuration class
+    """
+    mock_get_config.return_value = ProwlerConfig()
+    assert get_config()
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.check_output_folder', return_value=True)
+def test_execute_aws_validation(mock_execute_aws_validation) -> None:
+    """
+    Tests that execution_aws_validation
+    returns a boolean
+    """
+    bucket_name = "TestBucket"
+    account_id = "123456789"
+    assert execute_aws_validation(bucket_name, account_id, BaseClient)
+
+
+@pytest.mark.core
+@patch('src.platsec.compliance.prowler_pipeline.create_output_folder', return_value=True)
+def test_create_aws_environment(mock_create_aws_environment) -> None:
+    """
+    Tests that the create_aws_environment
+    returns a boolean
+    """
+    bucket_name = "TestBucket"
+    account_id = "123456789"
+    assert create_aws_environment(bucket_name,account_id,BaseClient)
 
 @pytest.mark.aws
 def test_copy_report_to_s3() -> None:
