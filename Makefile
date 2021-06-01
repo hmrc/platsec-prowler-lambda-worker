@@ -11,10 +11,9 @@ fmt-check: docker-build
 .PHONY: test
 test: docker-build
 	@$(DOCKER_RUN) pytest \
-		--setup-show \
 		-v \
 		-p no:cacheprovider \
 		--no-header \
-		--cov=src
-		--cov-fail-under=100 \
+		--cov=src \
+		--cov-fail-under=90 \
 		--no-cov-on-fail
