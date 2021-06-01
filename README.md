@@ -28,10 +28,10 @@ This project allows for teams to create their own custom checks. A check is esse
 PlatSec has created a group that is a cut down of CIS level 2 checks and this is to be considered as the baseline security stance that will be run against all accounts.
 The baseline checks are called group20_Platsec. These will always be run against all accounts in the organization. Tests set by the teams will be run in addition to the baseline checks. If teams have not set their own checks, the baseline checks will still be run.
 
-##Getting Started
+## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-###Prerequisites
+### Prerequisites
 You will need the following installed on your machine:
 
 GNU Make
@@ -40,7 +40,7 @@ Pipenv
 Installing
 All dependencies are defined in the Pipfile In the root of the project, run pipenv install
 
-###Running the tests
+### Running the tests
 Tests are run from the project root. Before running tests, you will need to setup the environment. To do this, run make setup
 
 * To run all tests, run make test
