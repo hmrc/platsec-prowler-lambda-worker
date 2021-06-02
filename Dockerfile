@@ -15,5 +15,7 @@ RUN wget --no-check-certificate https://raw.githubusercontent.com/stedolan/jq/ma
     rm -f /tmp/jq-linux64.asc && \
     rm -f /tmp/jq-linux64
 RUN pip install awscli
-COPY lambda_function.py.bak ./ src/* ./
+RUN yum clean all
+RUN yum update -y
+COPY lambda_function.py ./ src/* ./
 CMD ["lambda_function.lambda_handler"]
