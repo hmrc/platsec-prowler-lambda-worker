@@ -86,7 +86,7 @@ def test_get_single_group_contents(tmpdir):
     """
 
     group_filenames = ['group1_iam']
-    group1_iam_file = tmpdir.join('group1_iam.sh')
+    group1_iam_file = tmpdir.join('group1_iam')
     group1_iam_file.write('GROUP_ID[1]="group1"')
 
     prowler_group = get_group_ids(tmpdir, group_filenames)
@@ -101,7 +101,7 @@ def test_get_single_group_full_contents(tmpdir):
     """
 
     group_filenames = ['group1_iam']
-    group1_iam_file = tmpdir.join('group1_iam.sh')
+    group1_iam_file = tmpdir.join('group1_iam')
     group1_iam_file.write('GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"')
 
     prowler_group = get_group_ids(tmpdir, group_filenames)
@@ -152,9 +152,9 @@ def test_get_multiple_group_contents(tmpdir):
     """
 
     group_filenames = ['group1_iam', 'group20_platsec', 'group2_ec2']
-    group1_iam_file = tmpdir.join('group1_iam.sh')
-    group20_platsec_file = tmpdir.join('group20_platsec.sh')
-    group2_ec2_file = tmpdir.join('group2_ec2.sh')
+    group1_iam_file = tmpdir.join('group1_iam')
+    group20_platsec_file = tmpdir.join('group20_platsec')
+    group2_ec2_file = tmpdir.join('group2_ec2')
 
     group1_iam_file.write('GROUP_ID[1]="group1"')
     group20_platsec_file.write('GROUP_ID[20]="platsec"')

@@ -117,7 +117,7 @@ def execute_prowler(account_number: str, report_name: str, region: str, bucket_n
 
     try:
         print(f"DEBUG *** {prowler_directory} creating attempt")
-
+        print(f"DEBUG --- executing prowler groups list {len(groups)}")
         print(f"DEBUG *** prowler_directory {prowler_directory}")
         os.chdir(prowler_directory)
         prowler_cmd = "./prowler"
@@ -190,15 +190,19 @@ def get_group_ids(path: str, group_filenames: list) -> List:
     Returns a list of group_ids from
     the specified path
     """
+    print(f"DEBUG --- get_group_ids {path}, {len(group_filenames)}")
     group_ids = []
     for file in group_filenames:
-        path_to_check = os.path.join(path, file + "." + "sh")
+        path_to_check = os.path.join(path, file)
+        print(f"DEBUG -- get_group_ids path to check {path_to_check}")
         if os.path.exists(path_to_check):
             os.chdir(path)
-            f = open(file + "." + "sh", "r")
+            f = open(file, "r")
             file_contents = f.readlines()
             group_ids.append(file_contents)
             f.close()
+        else:
+            print("No files for that group")
     return group_ids
 
 
@@ -207,6 +211,7 @@ def extract_group_ids(groups: list) -> List:
     Extracts the groups ids from a list
     containing specified groups file contents
     """
+    print(f"Groups in extract_group_ids{groups[0]}")
     group_ids = []
     for group in groups:
         group_parts = group[0].rsplit(" ")
@@ -216,6 +221,7 @@ def extract_group_ids(groups: list) -> List:
         group_id = group_id_part[start:end]
         group_ids.append(group_id)
 
+    print(f"Group Ids in extract_group_ids {group_ids[0]}")
     return group_ids
 
 
