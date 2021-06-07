@@ -35,18 +35,25 @@ def execute_validation(json_data: str, group_location: str, default_group: str) 
     """
     try:
         prowler_run = ProwlerExecutionRun()
-        prowler_run.record_count = check_records(json_data)
+        print("DEBUG *** Passed Prowler Run Configuration")
         prowler_run.account_count = check_accounts(json_data)
+        print("DEBUG *** Passed Prowler check_accounts")
         if prowler_run.account_count == 0:
             raise PipelineValidationPhaseException("No accounts to process")
-        prowler_run.msgbody = extract_body(json_data)
         prowler_run.account_id = get_accountinfo(prowler_run.msgbody)
+        print("DEBUG *** Passed Prowler get_accountinfo")
         prowler_run.account_name = get_account_name(prowler_run.msgbody)
+        print("DEBUG *** Passed Prowler get_account_name")
         prowler_run.groups = get_groups(prowler_run.msgbody, default_group)
+        print("DEBUG *** Passed Prowler get_groups")
         prowler_run.new_report_name = create_new_report_name(prowler_run.account_id)
+        print("DEBUG *** Passed Prowler create_new_report_name")
         validate_groups(prowler_run.groups, group_location, default_group)
+        print("DEBUG *** Passed Prowler validate_groups")
         prowler_run.group_contents = get_group_ids(group_location, prowler_run.groups)
+        print("DEBUG *** Passed Prowler group_contents")
         prowler_run.group_ids = extract_group_ids(prowler_run.group_contents)
+        print("DEBUG *** Passed Prowler extract_group_ids")
         return prowler_run
     except Exception as error:
         print(f"DEBUG *** execute_validation err {error}")

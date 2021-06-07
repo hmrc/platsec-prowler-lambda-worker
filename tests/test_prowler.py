@@ -165,23 +165,6 @@ def test_get_multiple_group_contents(tmpdir):
     assert len(prowler_group) == 3
 
 
-
-
-@pytest.mark.core
-def test_message_body_extraction() -> None:
-    """
-    Test the extraction of the records
-    from the SQS message
-    """
-    record = get_valid_test_sqs_message()
-
-    message_body = extract_body(record)
-
-    assert message_body is not None
-    assert len(message_body) == 1
-    assert message_body[0] == {"Id": "480830536305", "Name": "hrkdev", "Groups": [1, 2, 3]}
-
-
 @pytest.mark.validation
 def test_get_account_info_valid_msg() -> None:
     """
@@ -227,31 +210,6 @@ def test_message_body_extraction_errors_on_missing_message() -> None:
 
     with pytest.raises(ValueError):
         extract_body(record)
-
-
-@pytest.mark.validation
-def test_records_check() -> None:
-    """
-    Only One record should be returned
-    in the body of the SQS message
-    """
-    json_data = get_valid_test_sqs_message()
-
-    records = check_records(json_data)
-
-    assert records == 1
-
-
-@pytest.mark.validation
-def test_multiple_records_raises_error() -> None:
-    """
-    Multiple Records in SQS Message should
-    raise an error
-    """
-    json_data = get_invalid_multi_records_sqs_message()
-
-    with pytest.raises(ValueError):
-        records = check_records(json_data)
 
 
 @pytest.mark.validation
@@ -309,8 +267,7 @@ def test_get_accounts() -> None:
     accounts to process.
     """
     json_data = get_valid_test_sqs_message()
-    records = json_data["Records"][0]["body"]
-    account = get_accountinfo(records)
+    account = get_accountinfo(json_data)
 
     assert isinstance(account, str)
 
@@ -330,15 +287,14 @@ def test_get_accounts_returns_IndexError() -> None:
 @pytest.mark.validation
 def test_get_accounts_returns_KeyError() -> None:
     """
-    Tests that an error is raised if there are
-    accounts to process.
+    Tests that an error is raised if there is no
+    Id key in message.
     """
 
-    json_data = get_valid_test_sqs_message()
-    records = json_data["Records"][0]
+    json_data = {"Name": "xxxx", "Groups": []}
 
     with pytest.raises(KeyError):
-        get_accountinfo(records)
+        get_accountinfo(json_data)
 
 
 @pytest.mark.validation
@@ -763,11 +719,11 @@ def test_execute_diff_raises_exception() -> None:
 
 
 @pytest.mark.validation
-def test_get_groups_returns_indexception() -> None:
-    records_data = ""
+def test_get_groups_returns_keyerror() -> None:
+    records_data = {"Id": "806352241843", "Name": "xxxx"}
     default_group = ""
-    with pytest.raises(IndexError):
-        response = get_groups(records_data, default_group)
+    with pytest.raises(KeyError):
+        get_groups(records_data, default_group)
 
 
 @pytest.mark.core
@@ -784,10 +740,7 @@ def test_get_groups_returns_default_group() -> None:
     Tests that the default group is returned
     When no groups are sepcified
     """
-    records_data = [
-                    {"Id": "480830536305", "Name": "hrkdev", "Groups": []}
-                ]
-
+    records_data = get_valid_test_sqs_message()
     default_group = "group20_platsec"
 
     groups = get_groups(records_data, default_group)
@@ -966,9 +919,8 @@ def test_get_groups_from_sqs_record() -> None:
     from the SQS Record
     """
     json_data = get_valid_test_sqs_message()
-    records = json_data["Records"][0]["body"]
     default_group = "group20_platsec"
-    groups = get_groups(records, default_group)
+    groups = get_groups(json_data, default_group)
 
     assert len(groups) > 0
 
@@ -1505,30 +1457,7 @@ def get_valid_test_sqs_message() -> dict:
     Simulates the JSON message being
     retrieved from SQS
     """
-
-    data = {
-        "Records": [
-            {
-                "messageId": "2e1424d4-f796-459a-8184-9c92662be6da",
-                "receiptHandle": "AQEBzWwaftRI0KuVm4tP+/7q1rGgNqicHq...",
-                "body": [
-                    {"Id": "480830536305", "Name": "hrkdev", "Groups": [1, 2, 3]}
-                ]
-                ,
-                "attributes": {
-                    "ApproximateReceiveCount": "1",
-                    "SentTimestamp": "1545082650636",
-                    "SenderId": "AIDAIENQZJOLO23YVJ4VO",
-                    "ApproximateFirstReceiveTimestamp": "1545082650649"
-                },
-                "messageAttributes": {},
-                "md5OfBody": "e4e68fb7bd0e697a0ae8f1bb342846b3",
-                "eventSource": "aws:sqs",
-                "eventSourceARN": "arn:aws:sqs:us-east-2:123456789012:my-queue",
-                "awsRegion": "us-east-2"
-            }
-        ]
-    }
+    data = {"Id": "806352241843", "Name": "xxxx", "Groups": []}
     return data
 
 

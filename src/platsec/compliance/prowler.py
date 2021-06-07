@@ -7,6 +7,7 @@ import os
 import time
 import subprocess
 import difflib
+import json
 from typing import List, Dict
 
 # Create a custom logger
@@ -28,16 +29,18 @@ def extract_body(msg: str) -> str:
         return msgBody
 
 
-def get_accountinfo(msg) -> str:
+def get_accountinfo(msg:dict) -> str:
     """
     Returns a dictionary containing the
     account id and an array of prowler group checks.
     """
+    print(f"DEBUG *** get_accountinfo {msg}")
     if msg == "":
         raise IndexError
     else:
         try:
-            account_id = msg[0]["Id"]
+            print(f"DEBUG *** get_accountinfo: {msg}")
+            account_id = msg["Id"]
             return account_id
         except KeyError as err:
             raise KeyError
@@ -54,27 +57,29 @@ def get_account_name(msg) -> str:
         raise err
 
 
-def check_accounts(msg) -> int:
+def check_accounts(msg: dict) -> int:
     """
     Returns the number of accounts to
     process.
+    The incoming msg is a string that contains the
+    Account Id, Groups and Account name
     """
     accounts = 0
 
     if msg != "":
-        accounts = len(msg["Records"][0]["body"])
+        accounts = len(msg["Id"])
 
     return accounts
 
 
-def check_records(msg) -> int:
+def check_records(msg: dict) -> int:
     """
     Returns the number of records
     sent in the SQS message
     """
     records = 0
     if msg is not None:
-        records = len(msg["Records"])
+        records = len(int(msg["Id"]))
 
     if records != 1:
         raise ValueError("Not expected single record")
@@ -166,13 +171,13 @@ def create_diff(original_report: str, generated_report: str) -> str:
         raise error
 
 
-def get_groups(records_data: str, default_group: str) -> List:
+def get_groups(records_data: dict, default_group: str) -> List:
     """
     Returns the specified groups in the
     SQS Message
     """
     try:
-        if len(records_data[0]["Groups"]) > 0:
+        if len(records_data["Groups"]) > 0:
             return records_data[0]["Groups"]
         else:
             return [default_group]
