@@ -117,12 +117,17 @@ def execute_prowler(account_number: str, report_name: str, region: str, bucket_n
 
     try:
         print(f"DEBUG *** {prowler_directory} creating attempt")
-        print(f"DEBUG --- executing prowler groups list {len(groups)}")
         print(f"DEBUG *** prowler_directory {prowler_directory}")
-        os.chdir(prowler_directory)
+
+        if os.getcwd() is not prowler_directory:
+            path_parent = os.path.dirname(os.getcwd())
+            print(f"DEBUG xxx new dir {path_parent}")
+            os.chdir(path_parent)
+
         prowler_cmd = "./prowler"
         if len(groups) == 1:
             group_list = groups[0]
+            print(f"DEBUG --- execute_prowler groups_list {group_list}")
         else:
             group_list = ','.join(groups)
 
@@ -143,6 +148,9 @@ def execute_prowler(account_number: str, report_name: str, region: str, bucket_n
             stdin=p1.stdout,
         )
         report_generated = True
+    except Exception as error:
+        print(os.getcwd())
+        print(f"EXCEPTION **** {error}")
     finally:
         return report_generated
 
@@ -214,12 +222,11 @@ def extract_group_ids(groups: list) -> List:
     print(f"Groups in extract_group_ids{groups[0]}")
     group_ids = []
     for group in groups:
-        group_parts = group[0].rsplit(" ")
-        group_id_part = group_parts[0]
-        start = group_id_part.find('"')
-        end = len(group_id_part)
-        group_id = group_id_part[start:end]
-        group_ids.append(group_id)
+        for item in group:
+            if 'GROUP_ID' in item:
+                group_parts = item.split("'")
+                group_id_part = group_parts[1]
+                group_ids.append(group_id_part)
 
     print(f"Group Ids in extract_group_ids {group_ids[0]}")
     return group_ids

@@ -110,27 +110,15 @@ def test_get_single_group_full_contents(tmpdir):
 
 
 @pytest.mark.validation
-def test_extract_group_id_single_group():
+def test_extract_group_id_full_file():
     """
-    Tests group extraction
+    Tests group extraction for a full file
     """
-    groups = [['GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"']]
+    groups = [['#!/usr/bin/env bash\n', '\n', '# Prowler - the handy cloud security tool (c) by Toni de la Fuente\n', '#\n', '# This Prowler check is licensed under a\n', '# Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.\n', '#\n', '# You should have received a copy of the license along with this\n', '# work. If not, see <http://creativecommons.org/licenses/by-nc-sa/4.0/>.\n', '\n', "GROUP_ID[1]='group1'\n", "GROUP_NUMBER[1]='1.0'\n", "GROUP_TITLE[1]='Identity and Access Management - CIS only - [group1] ***********'\n", "GROUP_RUN_BY_DEFAULT[1]='Y' # run it when execute_all is called\n", "GROUP_CHECKS[1]='check11,check12,check13,check14,check15,check16,check17,check18,check19,check110,check111,check112,check113,check114,check115,check116,check117,check118,check119,check120,check121,check122,extra774'\n"]]
     group_ids = extract_group_ids(groups)
 
     assert len(group_ids) == 1
-
-
-@pytest.mark.validation
-def test_extract_group_id_multiple_group():
-    """
-    Tests group extraction
-    """
-    groups = [['GROUP_ID[1]="group1" GROUP_NUMBER[1]="1.0" GROUP_TITLE[1]="IAManagement - CIS only - [group1] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"'],
-              ['GROUP_ID[2]="group2" GROUP_NUMBER[2]="2.0" GROUP_TITLE[2]="EC2Management - CIS only - [group2] ***********" GROUP_RUN_BY_DEFAULT[1]="Y" # run it when execute_all is called GROUP_CHECKS[1]="check11,check12"']]
-
-    group_ids = extract_group_ids(groups)
-
-    assert len(group_ids) == 2
+    assert group_ids[0] == "group1"
 
 
 @pytest.mark.validation
