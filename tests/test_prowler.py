@@ -170,8 +170,8 @@ def test_get_account_info_valid_msg() -> None:
     """
     Tests that a valid name can be returned
     """
-    data = [{"Id": "480830536305", "Name": "hrkdev", "Groups": [1, 2, 3]}]
-    expected = "hrkdev"
+    data = get_valid_test_sqs_message()
+    expected = "xxxx"
 
     actual = get_account_name(data)
     assert actual == expected
@@ -182,20 +182,8 @@ def test_get_account_info_missing_name_returns_key_error() -> None:
     """
     Tests that a missing name raises a key error
     """
-    data = [{"Id": "480830536305", "Groups": [1, 2, 3]}]
+    data ={"Id": "806352241843", "Groups": []}
     with pytest.raises(KeyError):
-        get_account_name(data)
-
-
-@pytest.mark.validation
-def test_get_account_info_returns_index_error() -> None:
-    """
-    Test that an index error is returned
-    When a incorrect message is sent
-    """
-    data = []
-
-    with pytest.raises(IndexError):
         get_account_name(data)
 
 

@@ -51,7 +51,7 @@ def get_account_name(msg) -> str:
     Returns the account name
     """
     try:
-        account_name = msg[0]["Name"]
+        account_name = msg["Name"]
         return account_name
     except KeyError as err:
         raise err
