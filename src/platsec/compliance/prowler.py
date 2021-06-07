@@ -178,7 +178,7 @@ def get_groups(records_data: dict, default_group: str) -> List:
     """
     try:
         if len(records_data["Groups"]) > 0:
-            return records_data[0]["Groups"]
+            return records_data["Groups"]
         else:
             return [default_group]
     except IndexError as err:
