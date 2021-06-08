@@ -28,6 +28,9 @@ This project allows for teams to create their own custom checks. A check is esse
 PlatSec has created a group that is a cut down of CIS level 2 checks and this is to be considered as the baseline security stance that will be run against all accounts.
 The baseline checks are called group20_Platsec. These will always be run against all accounts in the organization. Tests set by the teams will be run in addition to the baseline checks. If teams have not set their own checks, the baseline checks will still be run.
 
+Please not that if you are creating your own groups the file must have the
+following run against it chmod 664 <file_name>.
+
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 

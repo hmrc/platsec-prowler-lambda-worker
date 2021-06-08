@@ -34,6 +34,7 @@ def execute_validation(json_data: str, group_location: str, default_group: str) 
     to run prowler
     """
     try:
+        print(f"DEBUG ---Incoming SQS Message {json_data}")
         prowler_run = ProwlerExecutionRun()
         print("DEBUG *** Passed Prowler Run Configuration")
         prowler_run.account_count = check_accounts(json_data)
