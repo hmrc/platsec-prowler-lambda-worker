@@ -1,0 +1,11 @@
+version: 0.2
+phases:
+  build:
+    commands:
+     # - make test # temp commented out while pipline is developed
+      - make docker-build
+      - docker save -o docker.tar platsec/prowler:local
+artifacts:
+  files:
+    - docker.tar
+
