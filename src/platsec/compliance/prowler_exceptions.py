@@ -20,3 +20,7 @@ class PipelineNoneError(Exception):
 
 class ProwlerExecutionError(Exception):
     pass
+
+
+class EmptySQSMessage(Exception):
+    pass

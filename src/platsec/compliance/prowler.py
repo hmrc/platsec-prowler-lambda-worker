@@ -18,32 +18,31 @@ c_handler.setFormatter(c_format)
 logger.addHandler(c_handler)
 
 
-def extract_body(msg: str) -> str:
+def extract_body(event: Dict) -> dict:
     """
     Extracts the body from the message
     """
-    if msg == "" or msg is None:
+    if event == "" or event is None:
         raise ValueError("SQS Message has no body element")
     else:
-        msgBody = msg["Records"][0]["body"]
-        return msgBody
+        for record in event['Records']:
+            payload = record["body"]
+            return json.loads(payload)
 
 
-def get_accountinfo(msg:dict) -> str:
+def get_accountinfo(msg: dict) -> str:
     """
     Returns a dictionary containing the
     account id and an array of prowler group checks.
     """
-    print(f"DEBUG *** get_accountinfo {msg}")
     if msg == "":
         raise IndexError
     else:
         try:
-            print(f"DEBUG *** get_accountinfo: {msg}")
-            account_id = msg["Id"]
+            account_id = msg['Id']
             return account_id
         except KeyError as err:
-            raise KeyError
+            raise err
 
 
 def get_account_name(msg) -> str:
@@ -51,7 +50,7 @@ def get_account_name(msg) -> str:
     Returns the account name
     """
     try:
-        account_name = msg["Name"]
+        account_name = msg['Name']
         return account_name
     except KeyError as err:
         raise err
@@ -65,9 +64,9 @@ def check_accounts(msg: dict) -> int:
     Account Id, Groups and Account name
     """
     accounts = 0
-
+    print(f"DEBUG --- check_account msg parameter {msg}")
     if msg != "":
-        accounts = len(msg["Id"])
+        accounts = len(msg[0])
 
     return accounts
 
@@ -79,7 +78,7 @@ def check_records(msg: dict) -> int:
     """
     records = 0
     if msg is not None:
-        records = len(int(msg["Id"]))
+        records = len(msg[0])
 
     if records != 1:
         raise ValueError("Not expected single record")
@@ -94,21 +93,12 @@ def validate_groups(groups: List, path: str, default_group: str) -> list:
     or throw a value error if not.
     """
     print(f"DEBUG *** groups {groups} path {path} default {default_group}")
-    if len(groups) > 0:
-        try:
-            check_list = os.listdir(path)
-            process_list = [group for group in groups if group in check_list]
-            print(f" Process list {process_list}")
-            if len(process_list) > 0:
-                return process_list
-            else:
-                raise ValueError("No valid groups found")
-        except FileNotFoundError as error:
-            logger.error("File not found")
-            raise error
-    else:
-        default_process_list = [default_group]
-        return default_process_list
+    check_list = os.listdir(path)
+    process_list = [group for group in groups if group in check_list]
+    print(f" Process list {process_list}")
+    if len(process_list) == 0:
+         process_list.append(default_group)
+    return process_list
 
 
 def execute_prowler(account_number: str, report_name: str, region: str, bucket_name: str, prowler_directory: str,
@@ -179,14 +169,30 @@ def create_diff(original_report: str, generated_report: str) -> str:
         raise error
 
 
+def create_diff_v2(original_report: str, generated_report: str) -> str:
+    """
+    Generates a difference on the
+    Two Files
+    """
+    try:
+        d = difflib.Differ()
+        diff = d.compare(original_report.split(), generated_report.split())
+        diff_text = '\n'.join(diff)
+        return diff_text
+    except Exception as error:
+        logger.error(f"did not generate diff report {error}")
+        raise error
+
+
 def get_groups(records_data: dict, default_group: str) -> List:
     """
     Returns the specified groups in the
     SQS Message
     """
+    groups = records_data["Groups"]
     try:
-        if len(records_data["Groups"]) > 0:
-            return records_data["Groups"]
+        if len(groups) > 0:
+            return groups
         else:
             return [default_group]
     except IndexError as err:

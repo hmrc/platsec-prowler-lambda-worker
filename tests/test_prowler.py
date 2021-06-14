@@ -80,6 +80,14 @@ def test_get_config_returns_valid() -> None:
 
 
 @pytest.mark.validation
+def test_extract_body_from_event() -> None:
+    event = get_sqs_event_message()
+    body = extract_body(event)
+
+    assert body is not None
+
+
+@pytest.mark.validation
 def test_get_single_group_contents(tmpdir):
     """
     Tests returning a group
@@ -309,22 +317,6 @@ def test_validate_groups_returns_default_group() -> None:
 
 
 @pytest.mark.validation
-def test_validate_groups_return_valueerror() -> None:
-    """
-    Checks to see if the validate groups
-    returns a ValueError
-    """
-    test_record = {"Id": "121212", "Name": "account-one", "Groups": ["false_group"]}
-    groups = test_record["Groups"]
-    default_group = "platsec20"
-    path = os.path.join(os.getenv("HOME"), "Development/PythonProwlerImplementation",
-                        "src/platsec/compliance/lib/prowler/groups")
-
-    with pytest.raises(ValueError):
-        validate_groups(groups, path, default_group)
-
-
-@pytest.mark.validation
 def test_validate_groups_return_filenotfounderror() -> None:
     """
     Checks to see if the validate groups
@@ -337,21 +329,6 @@ def test_validate_groups_return_filenotfounderror() -> None:
 
     with pytest.raises(FileNotFoundError):
         validate_groups(groups, path, default_group)
-
-
-@pytest.mark.validation
-def test_validate_groups_return_error() -> None:
-    """
-    Checks to see if the validate groups
-    returns a ValueError
-    """
-    groups = None
-    account_name = "account-one"
-    path = os.path.join(os.getenv("HOME"), "Development/PythonProwlerImplementation",
-                        "src/platsec/compliance/lib/prowler/groups")
-
-    with pytest.raises(Exception):
-        validate_groups(account_name, groups, path)
 
 
 @pytest.mark.aws
@@ -839,8 +816,9 @@ def test_execute_clean_up(mock_exectute_cleanup) -> None:
     the file system environment
     """
     bucket_name="TestBucket"
+    account_id = "3298024"
     mock_exectute_cleanup.return_value = ["test.txt"]
-    files = execute_clean_up(bucket_name, BaseClient)
+    files = execute_clean_up(bucket_name,account_id, BaseClient)
     assert files is False
 
 
@@ -853,10 +831,11 @@ def test_execute_clean_up_multiple_files(mock_execute_cleanup, mock_delete_old_f
     the file system environment
     """
     bucket_name="TestBucket"
+    account_id = "12345678"
     files_list = mock_execute_cleanup.return_value = ["test.txt", "ert.dh", "tryr.sh", "ert.sh"]
     mock_delete_old_files.return_value = "test"
 
-    files = execute_clean_up(bucket_name, BaseClient)
+    files = execute_clean_up(bucket_name,account_id, BaseClient)
 
     assert files is True
 
@@ -1421,11 +1400,15 @@ def test_pretty_print_returns() -> None:
 
 
 @pytest.mark.core
-def test_formatted_groups_returns_valid_list() -> None:
+def test_check_account() -> None:
     """
     Tests that we have the correct formatted list
 
     """
+    data = {"Id": "723056447855", "Name": "PlatApps-Labs", "Groups": []}
+    accounts = check_accounts(data)
+    assert accounts == 1
+
 
 
 def get_valid_test_sqs_message() -> dict:
@@ -1448,6 +1431,57 @@ def get_client_error(operation: str, code: str, msg: str):
         }
     )
 
+
+def get_sqs_event_message() -> dict:
+    """
+    Returns a valid copy of the SQS Event Message
+    """
+    data = {
+        "Records": [
+            {
+                "messageId": "2e1424d4-f796-459a-8184-9c92662be6da",
+                "receiptHandle": "AQEBzWwaftRI0KuVm4tP+/7q1rGgNqicHq...",
+                "body":
+                    {
+                        "Id": "121212",
+                        "Name": "account-one",
+                        "Checks": ["group1_iam"]
+                    },
+                "attributes": {
+                    "ApproximateReceiveCount": "1",
+                    "SentTimestamp": "1545082650636",
+                    "SenderId": "AIDAIENQZJOLO23YVJ4VO",
+                    "ApproximateFirstReceiveTimestamp": "1545082650649"
+                },
+                "messageAttributes": {},
+                "md5OfBody": "e4e68fb7bd0e697a0ae8f1bb342846b3",
+                "eventSource": "aws:sqs",
+                "eventSourceARN": "arn:aws:sqs:us-east-2:123456789012:my-queue",
+                "awsRegion": "us-east-2"
+            },
+            {
+                "messageId": "2e1424d4-f796-459a-8184-9c92662be6da",
+                "receiptHandle": "AQEBzWwaftRI0KuVm4tP+/7q1rGgNqicHq...",
+                "body": [
+                    {"Id": "121212", "Name": "account-one", "Checks": [1, 2, 3]},
+                    {"Id": "343434", "Name": "account-two", "Checks": [1, 2, 3]}
+                ]
+                ,
+                "attributes": {
+                    "ApproximateReceiveCount": "1",
+                    "SentTimestamp": "1545082650636",
+                    "SenderId": "AIDAIENQZJOLO23YVJ4VO",
+                    "ApproximateFirstReceiveTimestamp": "1545082650649"
+                },
+                "messageAttributes": {},
+                "md5OfBody": "e4e68fb7bd0e697a0ae8f1bb342846b3",
+                "eventSource": "aws:sqs",
+                "eventSourceARN": "arn:aws:sqs:us-east-2:123456789012:my-queue",
+                "awsRegion": "us-east-2"
+            }
+        ]
+    }
+    return data
 
 def get_invalid_multi_records_sqs_message() -> dict:
     """

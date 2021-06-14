@@ -13,6 +13,7 @@ from src.platsec.compliance.prowler import (
     get_groups,
     validate_groups,
     create_new_report_name,
+    create_diff_v2,
     execute_prowler,
     create_diff,
     create_new_diff_name,
@@ -27,34 +28,21 @@ from botocore.client import BaseClient
 from functools import reduce
 
 
-def execute_validation(json_data: str, group_location: str, default_group: str) -> ProwlerExecutionRun:
+def execute_validation(json_data: dict, group_location: str, default_group: str) -> ProwlerExecutionRun:
     """
     Called from the pipeline execution phase and returns a ProwlerExecutionRun object
     that has extracted the relevant parts of the incoming SQS message in order
     to run prowler
     """
     try:
-        print(f"DEBUG ---Incoming SQS Message {json_data}")
         prowler_run = ProwlerExecutionRun()
-        print("DEBUG *** Passed Prowler Run Configuration")
-        prowler_run.account_count = check_accounts(json_data)
-        print("DEBUG *** Passed Prowler check_accounts")
-        if prowler_run.account_count == 0:
-            raise PipelineValidationPhaseException("No accounts to process")
         prowler_run.account_id = get_accountinfo(json_data)
-        print("DEBUG *** Passed Prowler get_accountinfo")
         prowler_run.account_name = get_account_name(json_data)
-        print("DEBUG *** Passed Prowler get_account_name")
         prowler_run.groups = get_groups(json_data, default_group)
-        print("DEBUG *** Passed Prowler get_groups")
         prowler_run.new_report_name = create_new_report_name(prowler_run.account_id)
-        print("DEBUG *** Passed Prowler create_new_report_name")
         validate_groups(prowler_run.groups, group_location, default_group)
-        print("DEBUG *** Passed Prowler validate_groups")
         prowler_run.group_contents = get_group_ids(group_location, prowler_run.groups)
-        print("DEBUG *** Passed Prowler group_contents")
         prowler_run.group_ids = extract_group_ids(prowler_run.group_contents)
-        print("DEBUG *** Passed Prowler extract_group_ids")
         return prowler_run
     except Exception as error:
         print(f"DEBUG *** execute_validation err {error}")
@@ -120,7 +108,7 @@ def execute_diff_generation(bucket_name: str, account_id: str, s3_client: BaseCl
     if len(files_list) == 2:
         first_prowler_report = get_file_contents(bucket_name, account_id, files_list[0], s3_client)
         second_prowler_report = get_file_contents(bucket_name, account_id, files_list[1], s3_client)
-        diff_data = create_diff(first_prowler_report.decode('ascii'), second_prowler_report.decode('ascii'))
+        diff_data = create_diff_v2(first_prowler_report.decode('ascii'), second_prowler_report.decode('ascii'))
         return diff_data
     else:
         return ""
@@ -147,7 +135,7 @@ def execute_save_diff(filtered_diff_data: str, bucket_name: str, account_id: str
         return file_created
 
 
-def execute_clean_up(bucket_name: str, s3_client: BaseClient) -> bool:
+def execute_clean_up(bucket_name: str, account_id: str, s3_client: BaseClient) -> bool:
     """
     Deletes oldest prowler execution report as its no longer
     needed.
@@ -158,8 +146,11 @@ def execute_clean_up(bucket_name: str, s3_client: BaseClient) -> bool:
     2) The newest prowler execution file
     3) The difference report
     """
+
     files_deleted = False
-    file_list = get_sorted_file_list(bucket_name, s3_client)
+    print(f"DEBUG **** execute_clean_up {bucket_name}")
+    file_list = get_sorted_file_list(bucket_name,account_id, s3_client)
+
     print(f"DEBUG*** execute_clean_up file {file_list[0]}")
     if len(file_list) > 3:
         delete_old_files(bucket_name, file_list[0], s3_client)

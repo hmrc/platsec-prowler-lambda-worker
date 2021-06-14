@@ -207,7 +207,7 @@ def create_output_folder(
 
 
 def get_sorted_file_list(
-    bucket_name: str, s3_client: BaseClient
+    bucket_name: str, account_id: str, s3_client: BaseClient
 ) -> list:
     """
     Returns an ordered list of files
@@ -216,7 +216,7 @@ def get_sorted_file_list(
     try:
         get_last_modified = lambda file: int(file["LastModified"].strftime("%s"))
 
-        files = s3_client.list_objects_v2(Bucket=bucket_name)["Contents"]
+        files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=account_id)["Contents"]
         ordered_files = [file["Key"] for file in sorted(files, key=get_last_modified)]
 
         return ordered_files
