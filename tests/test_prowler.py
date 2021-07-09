@@ -87,6 +87,7 @@ def test_extract_body_from_event() -> None:
     assert body is not None
 
 
+
 @pytest.mark.validation
 def test_get_single_group_contents(tmpdir):
     """

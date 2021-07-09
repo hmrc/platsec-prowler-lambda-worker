@@ -18,7 +18,7 @@ def lambda_handler(event, context):
     Main entry point for the Lambda Function.
     This is called at the start by the Lambda Environment
     """
-    print(f"type conv {type(event)}")
+    print(f"Event Message {event}")
     execute_pipeline(event)
 
 

@@ -27,7 +27,7 @@ def extract_body(event: Dict) -> dict:
     else:
         for record in event['Records']:
             payload = record["body"]
-            return json.loads(payload)
+            return payload
 
 
 def get_accountinfo(msg: dict) -> str:
