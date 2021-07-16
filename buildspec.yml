@@ -4,7 +4,7 @@ phases:
     commands:
      # - make test # temp commented out while pipline is developed
       - make docker-build
-      - docker save -o docker.tar platsec/prowler:local
+      - docker save -o docker.tar container-release:local
 artifacts:
   files:
     - docker.tar
