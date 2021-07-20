@@ -1,8 +1,8 @@
-DOCKER_RUN = docker run --interactive --rm platsec/prowler:local
+DOCKER_RUN = docker run --interactive --rm container-release:local
 
 .PHONY: docker-build
 docker-build:
-	docker build -t platsec/prowler:local -f BuildEnv .
+	docker build -t container-release:local -f BuildEnv .
 
 .PHONY: fmt-check
 fmt-check: docker-build
