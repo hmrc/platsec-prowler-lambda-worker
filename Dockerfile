@@ -18,10 +18,11 @@ RUN yum install wget unzip -y \
 FROM base AS container-release
 COPY install_prowler.sh Pipfile.lock ./
 RUN bash install_prowler.sh && pipenv install --ignore-pipfile
-COPY lambda_function.py ./ src/* ./
+COPY custom_groups/* ./src/platsec/compliance/lib/prowler/groups/
+COPY lambda_function.py src ./
 CMD ["lambda_function.lambda_handler"]
 
-FROM base  AS pipenv
+FROM base AS pipenv
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN yum install shadow-utils -y
 RUN /usr/sbin/useradd -ms /bin/bash prowler

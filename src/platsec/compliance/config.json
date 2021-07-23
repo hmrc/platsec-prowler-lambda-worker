@@ -4,7 +4,7 @@
   "execution_role_arn": "test_role",
   "groups_location": "./platsec/compliance/lib/prowler/groups",
   "default_groups": [
-    "group20_platsec"
+    "group99_platsec"
   ],
   "temp_workspace_location": "./platsec/compliance/lib/prowler/workspace",
   "default_region": "eu-west-2"

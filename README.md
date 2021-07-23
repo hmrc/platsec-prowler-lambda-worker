@@ -35,7 +35,7 @@ defined benchmarks. This project allows for teams to create their own custom
 checks. A check is essentially a Bash script that executes API calls against the
 AWS cloud platform. PlatSec has created a group that is a cut down of CIS level
 2 checks and this is to be considered as the baseline security stance that will
-be run against all accounts. The baseline checks are called `group20_Platsec`.
+be run against all accounts. The baseline checks are called `group99_platsec`.
 These will always be run against all accounts in the organization. Tests set by
 the teams will be run in addition to the baseline checks. If teams have not set
 their own checks, the baseline checks will still be run.

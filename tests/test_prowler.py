@@ -148,13 +148,13 @@ def test_get_multiple_group_contents(tmpdir):
     Tests returning a group
     """
 
-    group_filenames = ['group1_iam', 'group20_platsec', 'group2_ec2']
+    group_filenames = ['group1_iam', 'group99_platsec', 'group2_ec2']
     group1_iam_file = tmpdir.join('group1_iam')
-    group20_platsec_file = tmpdir.join('group20_platsec')
+    group99_platsec_file = tmpdir.join('group99_platsec')
     group2_ec2_file = tmpdir.join('group2_ec2')
 
     group1_iam_file.write('GROUP_ID[1]="group1"')
-    group20_platsec_file.write('GROUP_ID[20]="platsec"')
+    group99_platsec_file.write('GROUP_ID[20]="platsec"')
     group2_ec2_file.write('GROUP_ID[2]="ec2"')
 
     prowler_group = get_group_ids(tmpdir, group_filenames)
@@ -454,8 +454,8 @@ def test_ensure_platsec_group_present() -> None:
     Config file passed from SQS
     """
     test_config = {"Id": "121212", "Name": "account-one",
-                   "Groups": ["group20_platsec", "group8_forensics", "group9_gdpr"]}
-    platsec_group = "group20_platsec"
+                   "Groups": ["group99_platsec", "group8_forensics", "group9_gdpr"]}
+    platsec_group = "group99_platsec"
 
     group_present = check_platsec_group(test_config, platsec_group)
 
@@ -471,7 +471,7 @@ def test_ensure_platsec_group_not_present() -> None:
     """
     test_config = {"Id": "121212", "Name": "account-one",
                    "Groups": ["group8_forensics", "group9_gdpr"]}
-    platsec_group = "group20_platsec"
+    platsec_group = "group99_platsec"
 
     group_present = check_platsec_group(test_config, platsec_group)
 
@@ -581,7 +581,7 @@ def test_execute_prowler(tmpdir) -> None:
     role = "test_role"
     bucket_name = "test_bucket"
     region = "eu-west-2"
-    group = ["group20_platsec"]
+    group = ["group99_platsec"]
     prowler_directory = tmpdir.mkdir('prowler_dir')
     prowler_file = prowler_directory.join('prowler')
     prowler_file.write('#!/bin/bash echo "Hello World"')
@@ -607,7 +607,7 @@ def test_execute_prowler_with_multiple_groups(tmpdir) -> None:
     role = "test_role"
     bucket_name = "test_bucket"
     region = "eu-west-2"
-    group = ["group20_platsec", "group23", "group_35"]
+    group = ["group99_platsec", "group23", "group_35"]
     prowler_directory = tmpdir.mkdir('prowler_dir')
     prowler_file = prowler_directory.join('prowler')
     prowler_file.write('#!/bin/bash echo "Hello World"')
@@ -631,7 +631,7 @@ def test_execute_prowler_returns_false_on_exception(tmpdir) -> None:
     role = "test_role"
     bucket_name = "test_bucket"
     region = "eu-west-2"
-    group = ["group20_platsec", "group23", "group_35"]
+    group = ["group99_platsec", "group23", "group_35"]
     prowler_directory = tmpdir.mkdir('prowler_dir')
     prowler_file = prowler_directory.join('prowler')
     prowler_file.write('#!/bin/bash echo "Hello World"')
@@ -671,7 +671,7 @@ def test_get_groups_returns_keyerror() -> None:
 
 @pytest.mark.core
 def test_format_default_groups() -> None:
-    default_groups = ["group20_platsec"]
+    default_groups = ["group99_platsec"]
     actual = format_default_groups(default_groups)
 
     assert len(actual) == 1
@@ -684,7 +684,7 @@ def test_get_groups_returns_default_group() -> None:
     When no groups are sepcified
     """
     records_data = get_valid_test_sqs_message()
-    default_group = "group20_platsec"
+    default_group = "group99_platsec"
 
     groups = get_groups(records_data, default_group)
     assert len(groups) == 1
@@ -864,7 +864,7 @@ def test_get_groups_from_sqs_record() -> None:
     from the SQS Record
     """
     json_data = get_valid_test_sqs_message()
-    default_group = "group20_platsec"
+    default_group = "group99_platsec"
     groups = get_groups(json_data, default_group)
 
     assert len(groups) > 0
