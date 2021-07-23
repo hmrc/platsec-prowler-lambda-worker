@@ -10,5 +10,6 @@ rm -rf prowler-${PROWLER_VERSION}
 wget https://github.com/toniblyx/prowler/archive/refs/tags/${PROWLER_VERSION}.zip -O prowler.zip
 unzip prowler.zip
 
+mkdir -p src/platsec/compliance/lib/prowler
 mv prowler-${PROWLER_VERSION}/* src/platsec/compliance/lib/prowler
 rm prowler.zip

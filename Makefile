@@ -1,16 +1,26 @@
-DOCKER_RUN = docker run --interactive --rm container-release:local
+PIPENV_RUN = docker run --interactive --rm pipenv
 
-.PHONY: docker-build
-docker-build:
-	docker build -t container-release:local -f BuildEnv .
+.PHONY: docker-pipenv
+docker-pipenv:
+	docker build \
+		--tag pipenv \
+		--target pipenv \
+		.
+
+.PHONY: container-release
+container-release:
+	docker build \
+		--tag container-release:local \
+		--target container-release \
+		.
 
 .PHONY: fmt-check
-fmt-check: docker-build
-	$(DOCKER_RUN) black .
+fmt-check: docker-pipenv
+	$(PIPENV_RUN) black .
 
 .PHONY: test
-test: docker-build
-	$(DOCKER_RUN) pytest \
+test: docker-pipenv
+	$(PIPENV_RUN) pytest \
 		-v \
 		-p no:cacheprovider \
 		--no-header \

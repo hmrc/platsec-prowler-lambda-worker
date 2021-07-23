@@ -1,21 +1,34 @@
-FROM public.ecr.aws/lambda/python:3.7
-LABEL maintainer="platsec"
+FROM public.ecr.aws/lambda/python:3.8 AS base
+LABEL maintainer="PlatSec"
 LABEL description="Prowler and dependencies for AWS Lambda"
 ENV JQ_VERSION='1.5'
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+RUN yum install wget unzip -y \
+    && yum clean all \
+    && rm -rf /var/cache/yum \
+    && wget https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -O /usr/bin/jq \
+    && wget https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key -O- \
+        | gpg --import \
+    && gpg --verify <(wget https://raw.githubusercontent.com/stedolan/jq/master/sig/v${JQ_VERSION}/jq-linux64.asc -O-) /usr/bin/jq \
+    && chmod +x /usr/bin/jq \
+    && pip install \
+        awscli \
+        pipenv
 
-RUN yum install wget -y
-RUN wget --no-check-certificate https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key -O /tmp/jq-release.key && \
-    wget --no-check-certificate https://raw.githubusercontent.com/stedolan/jq/master/sig/v${JQ_VERSION}/jq-linux64.asc -O /tmp/jq-linux64.asc && \
-    wget --no-check-certificate https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 -O /tmp/jq-linux64 && \
-    gpg --import /tmp/jq-release.key && \
-    gpg --verify /tmp/jq-linux64.asc /tmp/jq-linux64 && \
-    cp /tmp/jq-linux64 /usr/bin/jq && \
-    chmod +x /usr/bin/jq && \
-    rm -f /tmp/jq-release.key && \
-    rm -f /tmp/jq-linux64.asc && \
-    rm -f /tmp/jq-linux64
-RUN pip install awscli
-RUN yum clean all
-RUN yum update -y
+FROM base AS container-release
+COPY install_prowler.sh Pipfile.lock ./
+RUN bash install_prowler.sh && pipenv install --ignore-pipfile
 COPY lambda_function.py ./ src/* ./
 CMD ["lambda_function.lambda_handler"]
+
+FROM base  AS pipenv
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+RUN yum install shadow-utils -y
+RUN /usr/sbin/useradd -ms /bin/bash prowler
+WORKDIR /home/prowler/Development/PythonProwlerImplementation
+COPY install_prowler.sh Pipfile.lock ./
+RUN chown -R prowler:prowler /home/prowler/Development/PythonProwlerImplementation
+USER prowler
+RUN bash install_prowler.sh && pipenv install --ignore-pipfile  --dev
+COPY --chown=prowler:prowler ./ ./
+ENTRYPOINT ["/var/lang/bin/pipenv", "run"]
