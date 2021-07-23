@@ -1,0 +1,25 @@
+{
+    "Contents": [
+        {
+            "Key": "480830536305/",
+            "LastModified": "2021-02-11T13:21:19+00:00",
+            "ETag": "\"d41d8cd98f00b204e9800998ecf8427e\"",
+            "Size": 0,
+            "StorageClass": "STANDARD"
+        },
+        {
+            "Key": "480830536305/48083053630520210211-131944.txt",
+            "LastModified": "2021-02-11T13:21:19+00:00",
+            "ETag": "\"6cec99c28b772700027e3ea4d6c14743\"",
+            "Size": 8503,
+            "StorageClass": "STANDARD"
+        },
+         {
+            "Key": "480830536305/48083053630520210211-567944.txt",
+            "LastModified": "2021-02-11T13:21:19+00:00",
+            "ETag": "\"6cec99c28b772700027e3ea4d6c14743\"",
+            "Size": 8503,
+            "StorageClass": "STANDARD"
+        }
+    ]
+}

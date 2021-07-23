@@ -1,0 +1,12 @@
+{
+    "Expiration": "string",
+    "ETag": "string",
+    "ServerSideEncryption": "AES256",
+    "VersionId": "string",
+    "SSECustomerAlgorithm": "string",
+    "SSECustomerKeyMD5": "string",
+    "SSEKMSKeyId": "string",
+    "SSEKMSEncryptionContext": "string",
+    "BucketKeyEnabled": true,
+    "RequestCharged": "requester"
+}

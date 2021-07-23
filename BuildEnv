@@ -1,0 +1,10 @@
+FROM python:3.8-slim
+RUN pip3 install pipenv
+RUN useradd -ms /bin/bash prowler
+WORKDIR /home/prowler/Development/PythonProwlerImplementation
+COPY ./Pipfile.lock ./
+RUN chown -R prowler:prowler /home/prowler/Development/PythonProwlerImplementation
+USER prowler
+RUN pipenv install --ignore-pipfile  --dev
+COPY --chown=prowler:prowler ./ ./
+ENTRYPOINT ["/usr/local/bin/pipenv", "run"]
