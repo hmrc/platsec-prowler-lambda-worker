@@ -198,19 +198,6 @@ def test_message_body_extraction_errors_on_missing_message() -> None:
 
 
 @pytest.mark.validation
-def test_accounts_check() -> None:
-    """
-    Tests that we can check for accounts
-    being in the message body.:w
-
-    """
-    json_data = get_valid_test_sqs_message()
-    accounts = check_accounts(json_data)
-
-    assert accounts > 0
-
-
-@pytest.mark.validation
 def test_accounts_check_returns_zero() -> None:
     """
     Tests that we can check for accounts
@@ -600,6 +587,8 @@ def test_execute_prowler(tmpdir) -> None:
     prowler_file.write('#!/bin/bash echo "Hello World"')
     prowler_file.chmod(744)
 
+    # with patch('src.platsec.compliance.prowler.getcwd') as cwd:
+    #  "   cwd.return_value = prowler_directory
     with patch('subprocess.run') as mock_prowler:
         mock_prowler.return_value = True
         report_result = execute_prowler(account_number, role, region,
@@ -1400,18 +1389,6 @@ def test_pretty_print_returns() -> None:
     assert len(result) > 0
 
 
-@pytest.mark.core
-def test_check_account() -> None:
-    """
-    Tests that we have the correct formatted list
-
-    """
-    data = {"Id": "723056447855", "Name": "PlatApps-Labs", "Groups": []}
-    accounts = check_accounts(data)
-    assert accounts == 1
-
-
-
 def get_valid_test_sqs_message() -> dict:
     """
     Simulates the JSON message being
@@ -1483,6 +1460,7 @@ def get_sqs_event_message() -> dict:
         ]
     }
     return data
+
 
 def get_invalid_multi_records_sqs_message() -> dict:
     """

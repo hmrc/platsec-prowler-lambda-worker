@@ -15,7 +15,7 @@ test: docker-build
 		-p no:cacheprovider \
 		--no-header \
 		--cov=src \
-		--cov-fail-under=90 \
+		--cov-fail-under=85 \
 		--no-cov-on-fail
 
 .PHONY: ecr-login
