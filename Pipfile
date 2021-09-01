@@ -7,17 +7,17 @@ verify_ssl = true
 allow_prereleases = true
 
 [dev-packages]
-black = "*"
-coverage = "*"
-flake8 = "*"
-moto = "*"
-mypy = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-mock = "*"
+black = "==21.8b0"
+coverage = "==5.5"
+flake8 = "==3.9.2"
+moto = "==2.2.6"
+mypy = "==0.910"
+pytest = "==6.2.5"
+pytest-cov = "==2.12.1"
+pytest-mock = "==3.6.1"
 
 [packages]
-boto3 = "*"
+boto3 = "==1.18.33"
 
 [requires]
 python_version = "3.8"
