@@ -18,8 +18,9 @@ RUN yum install wget unzip -y \
 FROM base AS container-release
 COPY install_prowler.sh Pipfile.lock ./
 RUN bash install_prowler.sh && pipenv install --ignore-pipfile
+COPY lambda_function.py ./
+COPY src ./src
 COPY custom_groups/* ./src/platsec/compliance/lib/prowler/groups/
-COPY lambda_function.py src ./
 CMD ["lambda_function.lambda_handler"]
 
 FROM base AS pipenv
