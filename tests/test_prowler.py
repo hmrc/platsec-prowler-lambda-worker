@@ -87,6 +87,12 @@ def test_extract_body_from_event() -> None:
     assert body is not None
 
 
+@pytest.mark.validation
+def test_extract_body_returns_dict_string_input() -> None:
+    event = get_sqs_event_message()
+    body = extract_body(event)
+    assert isinstance(body, dict)
+
 
 @pytest.mark.validation
 def test_get_single_group_contents(tmpdir):
