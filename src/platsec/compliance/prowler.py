@@ -115,7 +115,7 @@ def execute_prowler(account_number: str, report_name: str, region: str, bucket_n
         if os.getcwd() is not prowler_directory:
             path_parent = os.path.dirname(os.getcwd())
             print(f"DEBUG xxx new dir {path_parent}")
-            os.chdir(prowler_directory)
+            os.chdir(path_parent)
 
         prowler_cmd = "./prowler"
         if len(groups) == 1:
