@@ -217,7 +217,10 @@ def get_sorted_file_list(
         get_last_modified = lambda file: int(file["LastModified"].strftime("%s"))
 
         files = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=account_id)["Contents"]
-        ordered_files = [file["Key"] for file in sorted(files, key=get_last_modified)]
+        """Exclude Diff Files"""
+        txtFiles = [file for file in files if ".txt" in file]
+
+        ordered_files = [file["Key"] for file in sorted(txtFiles, key=get_last_modified)]
 
         return ordered_files
 

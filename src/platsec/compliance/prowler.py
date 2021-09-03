@@ -27,6 +27,9 @@ def extract_body(event: Dict) -> dict:
     else:
         for record in event['Records']:
             payload = record["body"]
+            if isinstance(payload, str):
+                converted_payload = json.loads(payload)
+                return converted_payload
             return payload
 
 
@@ -45,7 +48,7 @@ def get_accountinfo(msg: dict) -> str:
             raise err
 
 
-def get_account_name(msg) -> str:
+def get_account_name(msg: dict) -> str:
     """
     Returns the account name
     """
