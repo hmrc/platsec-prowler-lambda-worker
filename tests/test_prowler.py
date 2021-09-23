@@ -88,6 +88,14 @@ def test_extract_body_from_event() -> None:
 
 
 @pytest.mark.validation
+def test_extract_body_from_string_event_returns_dict() -> None:
+    event = get_sqs_actual_event_message()
+    body = extract_body(event)
+
+    assert isinstance(body, dict)
+
+
+@pytest.mark.validation
 def test_extract_body_returns_dict_string_input() -> None:
     event = get_sqs_event_message()
     body = extract_body(event)
@@ -1414,6 +1422,11 @@ def get_client_error(operation: str, code: str, msg: str):
             }
         }
     )
+
+
+def get_sqs_actual_event_message() -> dict:
+    data = {'Records': [{'messageId': '857e3b3c-3b3c-4587-a056-fa6a468d2d48', 'receiptHandle': 'AQEBJl0nghgXxfr4vmsS/RltiqNWi25f7gTEoK8ToviVH3hge9LDGFz36teb1V8whPy8tm3BrP1Sl8BExhWQzCxaR9LEpIso0SOPH+O39PjC3SUwnR/zmk7wL4UQPc2V6kgXpeOwe3JiZT22uK+JlgQDVDLaAH8SsPRzWqf4vCCgZI2482fQC5X4b+akULQj2cbJFhraGNOXJrCfE9aCXDe4olxn9HloTe+8BIBreKqYA3XMOHN4CreviUlI1gtgY4tExx9yp/ry2F+s61C+jOdQnkXUgML2mr6lALuzNcRMAHAXO9AjP2HGNfkkP+M1Zad+gV2QVlUqgunOCTkEe23Dtay9Cc8oKeu+IAXhOAn8dLVUsa+3KkF6loUB9U+dkPmSnlh0ft962ykQ/WkUNEQglw==', 'body': '{"Id": "072254306672", "Name": "telemetry-mdtp-integration", "Groups": []}', 'attributes': {'ApproximateReceiveCount': '4', 'SentTimestamp': '1632358804697', 'SenderId': 'AROAUXE5JQEMAXI46D66B:platsec_lambda_prowler_manager', 'ApproximateFirstReceiveTimestamp': '1632358804697'}, 'messageAttributes': {}, 'md5OfBody': '7bef6ee9b338194464021b515981bcc9', 'eventSource': 'aws:sqs', 'eventSourceARN': 'arn:aws:sqs:eu-west-2:324599906584:prowler_scanner_queue', 'awsRegion': 'eu-west-2'}]}
+    return data
 
 
 def get_sqs_event_message() -> dict:
