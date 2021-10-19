@@ -30,6 +30,7 @@ def execute_pipeline(json_conv: dict):
 
     print(f"type conv {type(json_conv)}")
     msg_body = extract_body(json_conv)
+    print("extract_body_called")
     print(f"type conv {type(msg_body)}")
     print(f"Current Directory {os.getcwd()}")
     json_data = msg_body
